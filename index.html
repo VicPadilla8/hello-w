@@ -315,6 +315,40 @@ body[data-pane="dir"] [data-pane="det"], body[data-pane="det"] [data-pane="dir"]
 .play .stbar{animation:fxWipe .8s cubic-bezier(.2,.7,.2,1) .15s backwards}
 .play .stbar.zoom{animation-delay:.5s}
 
+/* ---------- controles en una fila, menú «Más», vigencia, conclusión del caso y afordancias ---------- */
+.filters{align-items:center}
+.filters .fq{margin-left:auto}
+.vsep{width:1px;align-self:stretch;background:var(--line);margin:2px 2px}
+.summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:640px){.summary{grid-template-columns:1fr}.filters .fq{margin-left:0;flex:1 1 100%}.vsep{display:none}}
+.more{position:relative}
+.more>summary{list-style:none;cursor:pointer;user-select:none}
+.more>summary::-webkit-details-marker{display:none}
+.more>summary::after{content:"▾";margin-left:6px;font-size:11px}
+.more[open]>summary{background:var(--accent2);color:var(--ink)}
+.more .menu{position:absolute;right:0;top:calc(100% + 6px);z-index:60;min-width:210px;display:flex;flex-direction:column;gap:2px;padding:6px;background:var(--paper);border:1px solid var(--line2);border-radius:10px;box-shadow:0 8px 28px rgba(22,32,48,.16)}
+.more .menu .btn{display:block;width:100%;text-align:left;color:var(--ink)}
+@media (max-width:1279px){.more .menu{right:auto;left:0}}
+.fresh{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0}
+.fresh span{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink2);background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.fresh span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+#ovK{grid-template-columns:repeat(3,1fr)}
+@media (max-width:640px){#ovK{grid-template-columns:1fr}}
+#ovLead{margin:10px 0 12px;font-size:14px;max-width:95ch}
+.ovflow{margin:16px 0 4px}
+.ovflow h3{margin:0 0 8px;font:700 13.5px var(--display)}
+.fseg{min-width:22px;display:flex;align-items:center;justify-content:center;color:#fff;font:700 13px var(--display)}
+.fold{margin-top:12px;border-top:1px solid var(--line2);padding-top:10px}
+.fold>summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:13px}
+.fold .serout{margin-top:8px}
+.info{position:relative}
+.info::after{content:"";position:absolute;inset:-10px}
+.row[data-dim],.stseg,.sord,#monthly .bar,.plist li button,#tbl tbody tr[data-open]{cursor:pointer}
+.row[data-dim]:hover .fill{filter:brightness(1.15)}
+.row[data-dim]:hover{background:var(--accent2)}
+#monthly .bar:hover .grow{filter:brightness(1.1)}
+.grow{transition:filter .15s ease}
+
 /* ---------- filtros en la barra fija, notas plegadas y tabla en tarjetas ---------- */
 .navf{display:flex;align-items:center;gap:2px;flex:0 1 auto;min-width:0;max-width:360px;font-size:13px;background:var(--accent2);border:1px solid var(--pillb);border-radius:5px;padding:1px 2px 1px 10px}
 .navt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -428,17 +462,23 @@ tbody tr{transition:background-color .12s ease}
       <div>
         <h1>Órdenes de trabajo</h1>
         <p class="sub">Soporte Técnico · Feiyue México</p>
+        <p class="fresh" id="fresh"></p>
       </div>
     </div>
     <div class="hright">
       <div class="meta" id="meta"></div>
       <div class="hbtns">
         <button type="button" class="btn primary" id="printBtn">Imprimir resumen</button>
-        <button type="button" class="btn" id="goalsBtn">Metas</button>
-        <button type="button" class="btn" id="glossBtn">Glosario</button>
         <button type="button" class="btn" id="serBtn">Buscar serie</button>
-        <button type="button" class="btn" id="docsBtn">Documentos</button>
-        <button type="button" class="btn" id="load">Cargar CSV nuevo</button>
+        <details class="more" id="moreMenu">
+          <summary class="btn">Más</summary>
+          <div class="menu">
+            <button type="button" class="btn" id="glossBtn">Glosario</button>
+            <button type="button" class="btn" id="goalsBtn">Metas de referencia</button>
+            <button type="button" class="btn" id="docsBtn">Documentos</button>
+            <button type="button" class="btn" id="load">Cargar CSV nuevo</button>
+          </div>
+        </details>
       </div>
       <input type="file" id="file" accept=".csv,text/csv" hidden>
     </div>
@@ -446,13 +486,19 @@ tbody tr{transition:background-color .12s ease}
 
   <div class="loadmsg" id="loadmsg" role="status" aria-live="polite" hidden></div>
 
-  <div class="views" id="views" role="group" aria-label="Vistas rápidas">
-    <span class="vlabel">Vistas rápidas</span>
-    <button type="button" class="chip" data-view="all" aria-pressed="false">Todo</button>
-    <button type="button" class="chip" data-view="month" aria-pressed="false">Último mes</button>
-    <button type="button" class="chip" data-view="pend" aria-pressed="false">Pendientes</button>
-    <button type="button" class="chip" data-view="overlock" aria-pressed="false">Caso Overlock</button>
-  </div>
+  <section class="filters" id="views" aria-label="Filtros y vistas">
+    <label class="field">Periodo <select id="period" title="Los últimos 30 y 90 días se cuentan hacia atrás desde la última fecha con datos"></select></label>
+    <div class="chips" role="group" aria-label="Vistas rápidas">
+      <button type="button" class="chip" data-view="all" aria-pressed="false">Todo</button>
+      <button type="button" class="chip" data-view="pend" aria-pressed="false">Pendientes</button>
+      <button type="button" class="chip" data-view="overlock" aria-pressed="false">Caso Overlock</button>
+    </div>
+    <span class="vsep" aria-hidden="true"></span>
+    <div class="chips" id="typeChips" role="group" aria-label="Tipo de trabajo"></div>
+    <label class="field fq">Buscar <input type="search" id="q" placeholder="Folio, serie, marca, texto…"></label>
+  </section>
+  <div class="pills" id="pills" aria-live="polite"></div>
+  <div class="docbanner" id="docBanner" hidden></div>
 
   <nav class="topnav" id="topnav" aria-label="Secciones del tablero">
     <div class="tabs" role="group" aria-label="Vista del tablero">
@@ -470,14 +516,6 @@ tbody tr{transition:background-color .12s ease}
     <div class="sumhead"><h2 id="sumH">Resumen ejecutivo</h2><p id="sumNote"></p></div>
     <div class="summary" id="summary"></div>
   </section>
-
-  <section class="filters" aria-label="Filtros">
-    <label class="field">Buscar <input type="search" id="q" placeholder="Folio, serie, marca, texto…"></label>
-    <label class="field">Periodo <select id="period" title="Los últimos 30 y 90 días se cuentan hacia atrás desde la última fecha con datos"></select></label>
-    <div class="chips" id="typeChips" role="group" aria-label="Tipo de trabajo"></div>
-  </section>
-  <div class="pills" id="pills" aria-live="polite"></div>
-  <div class="docbanner" id="docBanner" hidden></div>
 
   <section class="tapebox" id="sec-cinta" data-pane="det" aria-label="Línea de tiempo">
     <div class="tapehead">
@@ -498,9 +536,9 @@ tbody tr{transition:background-color .12s ease}
     <h2 class="gtitle" data-pane="det" id="g-chg" style="order:1">Última actualización de datos</h2>
     <h2 class="gtitle" data-pane="det" style="order:5">Distribución de las órdenes</h2>
     <section class="card c12" id="sec-reinc" data-pane="dir" style="order:47" aria-labelledby="reH">
-      <div class="chead"><div><h2 id="reH">Equipos con más de una orden</h2><p class="hint">Números de serie que aparecen en el título de dos o más órdenes. Detección automática: conviene validar cada caso. No aplica el filtro de fechas.</p></div></div>
+      <div class="chead"><div><h2 id="reH">Equipos reincidentes</h2><p class="hint">Series con más de una reparación o diagnóstico, detectadas por el número de serie en el título. Conviene validar cada caso. No aplica el filtro de fechas.</p></div></div>
       <p class="acthead" id="reincHead"></p>
-      <div class="serout" id="reincOut"></div>
+      <div id="reincOut"></div>
     </section>
     <h2 class="gtitle" data-pane="det" style="order:35">Bitácora y calidad de captura</h2>
     <h2 class="gtitle" data-pane="det" style="order:55">Listado</h2>
@@ -514,7 +552,9 @@ tbody tr{transition:background-color .12s ease}
         <div><h2 id="ovH">Caso Overlock FYA3 · bitácora de calidad</h2><p class="hint" id="ovHint"></p></div>
         <div class="ovacts" id="ovActs"></div>
       </div>
+      <p class="acthead" id="ovLead"></p>
       <div class="kpis" id="ovK"></div>
+      <div class="ovflow" id="ovFlow"></div>
       <div class="ovgrid">
         <div><h3 class="sub3">Revisiones registradas por semana</h3><div id="ovChart"></div></div>
         <div><h3 class="sub3">Por modelo</h3><div class="tscroll" id="ovModel"></div><p class="note" id="ovNote"></p></div>
@@ -774,7 +814,8 @@ const anyFilter = ()=>state.from||state.to||state.q||Object.values(state.sel).so
 
 /* ---------- encabezado y leyenda ---------- */
 function renderStatic(){
-  $('#meta').innerHTML = '<b>'+fmtN(DATA.length)+' órdenes</b> · '+fdate(dstr(DOM0+3))+' a '+fdate(dstr(REFC))+'<br>'+esc(SRC.short)+' · datos al '+fdate(dstr(REF));
+  $('#meta').innerHTML = '<b>'+fmtN(DATA.length)+' órdenes</b> · '+fdate(dstr(DOM0+3))+' a '+fdate(dstr(REFC))+'<br>'+esc(SRC.short);
+  $('#fresh').innerHTML='<span>Órdenes al '+fdate(dstr(REF))+'</span>'+((typeof SER!=='undefined'&&SER&&SER.updated)?'<span>Bitácora Overlock al '+sDate(SER.updated)+'</span>':'');
   $('#srcNote').innerHTML='<b>Fuente:</b> '+esc(SRC.label)+'. '+fmtN(DATA.length)+' órdenes creadas entre el '+fdate(dstr(DOM0+3))+' y el '+fdate(dstr(REFC))+', con actividad registrada hasta el '+fdate(dstr(REF))+'.';
   const eg={};EXCL_FOUND.forEach(id=>{(eg[EXCLUDED[id]]=eg[EXCLUDED[id]]||[]).push('#'+id);});
   const lst=a=>a.length>1?a.slice(0,-1).join(', ')+' y '+a[a.length-1]:a[0];
@@ -1039,7 +1080,7 @@ function renderDonut(){
   const seg=(k,lbl)=>{
     const v=m.get(k)||0;if(!v)return '';
     const on=sel.has(k);
-    return '<button type="button" class="stseg" data-dim="status" data-val="'+k+'" aria-pressed="'+on+'" aria-label="'+STATUS[k].l+': '+v+'" title="'+STATUS[k].l+': '+v+'" style="flex:'+v+' 1 0;background:'+STATUS[k].c+';opacity:'+((sel.size&&!on)?.35:1)+'">'+(lbl?'<span>'+v+'</span>':'')+'</button>';
+    return '<button type="button" class="stseg" data-dim="status" data-val="'+k+'" aria-pressed="'+on+'" aria-label="'+STATUS[k].l+': '+v+'" title="'+STATUS[k].l+': '+v+'" style="flex:'+v+' 1 0;background:'+STATUS[k].c+';opacity:'+((sel.size&&!on)?.35:1)+(k==='ON HOLD'?';color:#1b2430;text-shadow:none':'')+'">'+(lbl?'<span>'+v+'</span>':'')+'</button>';
   };
   const pc=v=>{if(!total)return '';const p=v/total*100;return ' · '+(v>0&&p<1?'<1':Math.round(p))+'%';};
   let s='<div class="stbig"><b>'+fmtN(pend)+'</b> '+(pend===1?'pendiente':'pendientes')+' de '+fmtN(total)+' órdenes</div><div class="stbars">';
@@ -1383,7 +1424,7 @@ function renderSummary(){
     lead:tc?'es la causa más frecuente, con '+tc[1]+(tc[1]===1?' orden.':' órdenes.'):(tl?'es la línea con más órdenes ('+tl[1]+').':'Aún no hay etiquetas de causa o línea suficientes.'),
     det:(tc||tl?'<p>'+(tc?'Causa más frecuente: <b>'+esc(tc[0])+'</b> ('+tc[1]+' órdenes). ':'')+(tl?'Línea con más órdenes: <b>'+esc(tl[0])+'</b> ('+tl[1]+').':'')+'</p>':'')+
     '<p>Calidad de datos: '+qualityText(qs)+'</p>'});
-  box.innerHTML=cards.map((c,i)=>'<article class="sum"><h3>'+c.t+'</h3><div class="big'+(c.txt?' txt':'')+'">'+c.big+'</div><p>'+c.lead+'</p>'+
+  box.innerHTML=cards.filter(c=>c.t!=='Avance'&&c.t!=='Pendientes').map((c,i)=>'<article class="sum"><h3>'+c.t+'</h3><div class="big'+(c.txt?' txt':'')+'">'+c.big+'</div><p>'+c.lead+'</p>'+
     (c.det?'<details data-k="'+i+'"'+((PRINTING||sumOpen.has(String(i)))?' open':'')+'><summary>Ver detalle</summary>'+c.det+'</details>':'')+'</article>').join('');
 }
 $('#summary').addEventListener('toggle',e=>{
@@ -1760,20 +1801,26 @@ function ovStats(){
   sRecs.forEach(r=>{const o=r.o||'';
     if(/funcional/i.test(o)&&/(actualiz|\.hex)/i.test(o))fw.add(r.s);
     if(/(nuevo panel|panel (utilizado|usado)|sin panel)/i.test(o))pn.add(r.s);});
-  const fwF=fall.filter(s=>fw.has(s)).length, none=fall.filter(s=>!fw.has(s)&&!pn.has(s)).length;
+  const fwF=fall.filter(s=>fw.has(s)).length, none=fall.filter(s=>!fw.has(s)&&!pn.has(s)).length, pnF=fall.filter(s=>!fw.has(s)&&pn.has(s)).length;
   const model=m=>{const ss=series.filter(s=>by[s][0].m===m);return {n:ss.length,f:ss.filter(s=>fall.indexOf(s)>=0).length};};
   const sec=sRecs.filter(r=>/por seguridad/i.test(r.o||'')), secD=sec.reduce((a,r)=>sKey(r.d)>sKey(a)?r.d:a,'');
-  return {series:series.length,fall:fall.length,fw:fwF,none:none,m4:model('FYA3-4D'),m5:model('FYA3-5D'),sec:new Set(sec.map(r=>r.s)).size,secD:secD};
+  return {series:series.length,fall:fall.length,fw:fwF,none:none,m4:model('FYA3-4D'),m5:model('FYA3-5D'),pn:pnF,sec:new Set(sec.map(r=>r.s)).size,secD:secD};
 }
 function renderOverlock(){
   if(!sRecs.length){$('#sec-overlock').hidden=true;return;}
   $('#sec-overlock').hidden=false;
   const st=ovStats();
   $('#ovHint').textContent='Revisiones de control de calidad al '+(SER.updated?sDate(SER.updated):'—')+'. «Falla» es el diagnóstico inicial; el resultado posterior se lee en las observaciones. Fuente distinta de MaintainX.';
-  $('#ovK').innerHTML=[['Series revisadas',st.series,'equipos distintos'],['Con falla registrada',st.fall,pctTxt(st.fall,st.series)+' de las series'],['Funcionales tras actualizar firmware',st.fw,'según observaciones'],['Sin resultado registrado',st.none,'series con falla']]
-    .concat(st.sec?[['Actualizadas por seguridad',st.sec,'funcionales, tercera revisión · '+sDate(st.secD)]]:[])
+  $('#ovLead').innerHTML='De <b>'+fmtN(st.series)+' series revisadas</b>, '+fmtN(st.fall)+' ('+pctTxt(st.fall,st.series)+') presentaron falla. De ellas, <b>'+fmtN(st.fw)+' quedaron funcionales</b> tras actualizar el firmware'+
+    (st.pn?', '+fmtN(st.pn)+' tuvieron cambio o retiro de panel':'')+' y <b>'+fmtN(st.none)+' siguen sin resultado registrado</b>.'+
+    (st.sec?' Además, '+fmtN(st.sec)+' series funcionales recibieron la actualización por seguridad en una tercera revisión ('+sDate(st.secD)+').':'');
+  $('#ovK').innerHTML=[['Series revisadas',st.series,'equipos distintos'],['Con falla registrada',st.fall,pctTxt(st.fall,st.series)+' de las series']]
+    .concat(st.sec?[['Actualizadas por seguridad',st.sec,'funcionales · '+sDate(st.secD)]]:[])
     .map(i=>'<div class="kpi"><div class="k">'+i[0]+'</div><div class="n">'+fmtN(i[1])+'</div><div class="s">'+i[2]+'</div></div>').join('');
-  $('#ovK').classList.toggle('k5',!!st.sec);
+  const fl=[['Funcionales tras actualizar firmware',st.fw,'var(--good)'],['Con cambio o retiro de panel',st.pn,'var(--accent)'],['Sin resultado registrado',st.none,'var(--bad)']].filter(x=>x[1]>0);
+  $('#ovFlow').innerHTML=st.fall?'<h3>Qué pasó con las '+fmtN(st.fall)+' series con falla</h3><div class="stbar zoom" role="img" aria-label="'+esc(fl.map(x=>x[0]+': '+x[1]).join('; '))+'">'+
+    fl.map(x=>'<span class="fseg" title="'+x[0]+': '+x[1]+'" style="flex:'+x[1]+' 1 0;background:'+x[2]+'">'+x[1]+'</span>').join('')+'</div>'+
+    '<div class="legend" style="margin-top:6px">'+fl.map(x=>'<span><i style="background:'+x[2]+'"></i>'+x[0]+' · '+x[1]+' ('+pctTxt(x[1],st.fall)+')</span>').join('')+'</div>':'';
   // semanas
   const wk={};let mn=1e9,mx=0;
   sRecs.forEach(r=>{const d=sDay(r.d);if(d==null||(r.e!=='OK'&&r.e!=='Falla'))return;const mon=d-((new Date(d*864e5).getUTCDay()+6)%7);wk[mon]=wk[mon]||{OK:0,Falla:0};wk[mon][r.e]++;mn=Math.min(mn,mon);mx=Math.max(mx,mon);});
@@ -1806,6 +1853,8 @@ function renderOverlock(){
 }
 
 /* ---------- equipos con más de una orden ---------- */
+let reincOpen=false;
+$('#reincOut').addEventListener('toggle',e=>{if(e.target.tagName==='DETAILS')reincOpen=e.target.open;},true);
 function renderReinc(){
   const sub=subset(['date']), by=new Map();
   sub.forEach(w=>{new Set(w.title.match(/\b\d{7,10}\b/g)||[]).forEach(n=>{if(!by.has(n))by.set(n,[]);by.get(n).push(w);});});
@@ -1813,15 +1862,16 @@ function renderReinc(){
     const o=e[1].slice().sort((a,b)=>a.created<b.created?-1:1);
     return {n:e[0],o:o,rep:o.filter(w=>w.act==='Reparación y diagnóstico').length};
   }).sort((a,b)=>b.rep-a.rep||b.o.length-a.o.length||(a.n<b.n?-1:1));
-  const re=list.filter(x=>x.rep>1).length;
-  $('#reincHead').innerHTML=list.length?'<b>'+fmtN(list.length)+(list.length===1?' equipo tiene':' equipos tienen')+'</b> dos o más órdenes; <b>'+fmtN(re)+'</b> de ellos con más de una reparación o diagnóstico. El resto acumula armado, revisión o preparación para exhibiciones.':'';
-  $('#reincOut').innerHTML=list.length?list.slice(0,12).map(x=>{
+  const card=x=>{
     const f=x.o[0],l=x.o[x.o.length-1],ln=Array.from(new Set([].concat.apply([],x.o.map(w=>w.line))))[0];
     return '<article class="scard"><div class="shead"><div><div class="snum">'+x.n+'</div><div class="smeta">'+esc(f.brand)+(ln?' · '+esc(ln):'')+' · '+fshort(f.created)+' a '+fdate(l.created)+'</div></div>'+
       (x.rep>1?'<span class="bad">'+x.rep+' reparaciones</span>':'<span class="smeta">'+(x.rep===1?'1 reparación':'Sin reparaciones')+'</span>')+'</div>'+
       '<div class="sords"><span>'+x.o.length+' órdenes:</span>'+x.o.map(w=>'<button type="button" class="sord" data-open="'+w.id+'" title="'+esc(w.title)+'"><i style="background:'+STATUS[w.status].c+'"></i>#'+w.id+' · '+esc(w.act==='Reparación y diagnóstico'?'Reparación':cut(w.act,22))+'</button>').join('')+'</div></article>';
-  }).join('')+(list.length>12?'<p class="srel">Y '+(list.length-12)+' equipos más.</p>':'')
-  :'<p class="srel">Ningún número de serie se repite con los filtros actuales.</p>';
+  };
+  const re=list.filter(x=>x.rep>1), rest=list.filter(x=>x.rep<=1);
+  $('#reincHead').innerHTML=re.length?'<b>'+fmtN(re.length)+(re.length===1?' equipo tiene':' equipos tienen')+'</b> más de una reparación o diagnóstico.':'Ningún equipo tiene reparaciones repetidas con los filtros actuales.';
+  $('#reincOut').innerHTML=(re.length?'<div class="serout">'+re.slice(0,12).map(card).join('')+'</div>':'')+
+    (rest.length?'<details class="fold"'+(reincOpen?' open':'')+'><summary>'+fmtN(rest.length)+(rest.length===1?' equipo más con varias órdenes':' equipos más con varias órdenes')+', sin reparación repetida</summary><p class="hint">Acumulan armado, revisión o preparación para exhibiciones.</p><div class="serout">'+rest.slice(0,24).map(card).join('')+'</div></details>':'');
 }
 
 /* ---------- qué cambió en la última actualización ---------- */
@@ -2113,6 +2163,10 @@ const FX=(function(){
     }
   };
 })();
+
+/* ---------- menú «Más» ---------- */
+document.addEventListener('click',e=>{const m=$('#moreMenu');if(m.open&&(!m.contains(e.target)||e.target.closest('.menu .btn')))m.open=false;});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#moreMenu').open=false;});
 
 /* ---------- ciclo de render ---------- */
 function renderAll(){

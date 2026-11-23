@@ -315,45 +315,6 @@ body[data-pane="dir"] [data-pane="det"], body[data-pane="det"] [data-pane="dir"]
 .play .stbar{animation:fxWipe .8s cubic-bezier(.2,.7,.2,1) .15s backwards}
 .play .stbar.zoom{animation-delay:.5s}
 
-/* ---------- bloques plegables, parte superior compacta y barra de secciones flotante ---------- */
-.card.folded>*:not(.keep):not(h2):not(.chead){display:none}
-.card.folded .chead .hint,.card.folded .chead>*:not(:first-child){display:none}
-.card.folded>.keep.note{margin-top:8px;font-size:13.5px;color:var(--ink)}
-.card.folded>.acthead{margin:8px 0 0}
-.foldbtn{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:4px 0;border:0;background:none;color:var(--accent);font:600 13px var(--body);cursor:pointer}
-.foldbtn::before{content:"▸";font-size:11px}
-.foldbtn[aria-expanded=true]::before{content:"▾"}
-.foldbtn:hover{text-decoration:underline}
-.card.folded{display:flex;flex-direction:column}
-.card.folded .foldbtn{margin-top:auto;padding-top:12px;align-self:flex-start}
-#sec-estado .stwrap .rows{flex-direction:row;flex-wrap:wrap;gap:2px 28px;justify-content:flex-start;flex:0 0 auto}
-#sec-estado .row{flex:0 0 auto;min-width:200px}
-.wrap{padding-top:20px}
-header.top{margin-bottom:14px;align-items:center}
-.logo{height:60px;padding:6px 8px}
-.brand{gap:14px}
-.brand h1{font-size:clamp(26px,3.2vw,34px)}
-.fresh{margin-top:6px}
-.filters{margin:0 0 12px}
-#kpis{margin-bottom:22px}
-.topnav{position:fixed;top:8px;left:50%;width:min(1240px,calc(100% - 40px));margin:0;z-index:40;transform:translate(-50%,-150%);opacity:0;pointer-events:none;transition:transform .28s cubic-bezier(.2,.7,.2,1),opacity .2s ease}
-.topnav.show{transform:translate(-50%,0);opacity:1;pointer-events:auto}
-@media (max-width:560px){.logo{height:52px;padding:5px 7px}.topnav{width:calc(100% - 16px)}}
-#period{min-width:0;width:168px}
-.filters .fq{font-size:0;gap:0}
-.filters .fq input[type=search]{width:168px;font-size:13px}
-.kpi .dl,.kpi .dl span{white-space:normal}
-.filters{gap:8px 10px}
-@media print{
-  .foldbtn,.info,.ovacts,.chead label.field,.fold>summary,.sum summary,.fnotes>summary{display:none!important}
-  .logo{height:52px;padding:0}
-  .gtitle{break-after:avoid;margin-top:8px}
-  .card h2,.sumhead{break-after:avoid}
-  .grid{display:flex!important;flex-direction:column;gap:12px}
-  .card,.scard,.sum,.kpi{break-inside:avoid}
-  .hint{display:none}
-}
-
 /* ---------- controles en una fila, menú «Más», vigencia, conclusión del caso y afordancias ---------- */
 .filters{align-items:center}
 .filters .fq{margin-left:auto}
@@ -526,11 +487,6 @@ tbody tr{transition:background-color .12s ease}
   <div class="loadmsg" id="loadmsg" role="status" aria-live="polite" hidden></div>
 
   <section class="filters" id="views" aria-label="Filtros y vistas">
-    <div class="tabs" role="group" aria-label="Vista del tablero">
-      <button type="button" data-pane-btn="dir" aria-pressed="true">Dirección</button>
-      <button type="button" data-pane-btn="det" aria-pressed="false">Detalle</button>
-    </div>
-    <span class="vsep" aria-hidden="true"></span>
     <label class="field">Periodo <select id="period" title="Los últimos 30 y 90 días se cuentan hacia atrás desde la última fecha con datos"></select></label>
     <div class="chips" role="group" aria-label="Vistas rápidas">
       <button type="button" class="chip" data-view="all" aria-pressed="false">Todo</button>
@@ -539,7 +495,7 @@ tbody tr{transition:background-color .12s ease}
     </div>
     <span class="vsep" aria-hidden="true"></span>
     <div class="chips" id="typeChips" role="group" aria-label="Tipo de trabajo"></div>
-    <label class="field fq">Buscar <input type="search" id="q" aria-label="Buscar" placeholder="Buscar folio, serie, marca…"></label>
+    <label class="field fq">Buscar <input type="search" id="q" placeholder="Folio, serie, marca, texto…"></label>
   </section>
   <div class="pills" id="pills" aria-live="polite"></div>
   <div class="docbanner" id="docBanner" hidden></div>
@@ -596,7 +552,7 @@ tbody tr{transition:background-color .12s ease}
         <div><h2 id="ovH">Caso Overlock FYA3 · bitácora de calidad</h2><p class="hint" id="ovHint"></p></div>
         <div class="ovacts" id="ovActs"></div>
       </div>
-      <p class="acthead keep" id="ovLead"></p>
+      <p class="acthead" id="ovLead"></p>
       <div class="kpis" id="ovK"></div>
       <div class="ovflow" id="ovFlow"></div>
       <div class="ovgrid">
@@ -606,16 +562,16 @@ tbody tr{transition:background-color .12s ease}
     </section>
 
     <section class="card c8" id="sec-backlog" data-pane="dir" style="order:60">
-      <h2 id="backH">Pendientes a lo largo del tiempo</h2>
-      <p class="hint">Pendientes a lo largo del tiempo: órdenes sin completar al cierre de cada semana. Línea punteada: cierre en lote <button type="button" class="info" data-gloss="lote" aria-label="Qué significa este término">?</button>. No aplica los filtros de fecha ni de estado.</p>
+      <h2>Pendientes a lo largo del tiempo</h2>
+      <p class="hint">Órdenes sin completar al cierre de cada semana. Línea punteada: cierre en lote <button type="button" class="info" data-gloss="lote" aria-label="Qué significa este término">?</button>. No aplica los filtros de fecha ni de estado.</p>
       <div id="backlog"></div>
-      <p class="note keep" id="backNote"></p>
+      <p class="note" id="backNote"></p>
     </section>
 
     <section class="card c4" id="sec-act" data-pane="dir" style="order:70">
-      <h2 id="actH">¿En qué se va el trabajo del área?</h2>
-      <p class="hint">En qué se va el trabajo del área. Clasificación aproximada por título y etiquetas; cuenta órdenes, no horas. Clic para filtrar.</p>
-      <p class="acthead keep" id="actHead"></p>
+      <h2>¿En qué se va el trabajo del área?</h2>
+      <p class="hint">Clasificación aproximada por título y etiquetas; cuenta órdenes, no horas. Clic para filtrar.</p>
+      <p class="acthead" id="actHead"></p>
       <div class="rows" id="acts"></div>
       <p class="note">Azul oscuro: trabajo técnico. Gris: armado, capacitación, apoyo y otras actividades.</p>
     </section>
@@ -636,19 +592,18 @@ tbody tr{transition:background-color .12s ease}
         <div><h2 id="cmpH">Mes contra mes anterior</h2><p class="hint">Aplica todos los filtros, excepto el rango de fechas.</p></div>
         <label class="field">Mes <select id="cmpSel"></select></label>
       </div>
-      <p class="acthead keep" id="cmpLead"></p>
       <div class="tscroll"><table id="cmpTbl"></table></div>
       <p class="note" id="cmpNote"></p>
     </section>
 
-    <section class="card c12" id="sec-mensual" data-pane="dir" style="order:30">
-      <h2 id="monH">Órdenes creadas por mes</h2>
-      <p class="hint">Órdenes creadas por mes. Barras: por tipo. Línea: completadas. Clic en un mes para filtrar.</p>
+    <section class="card c8" id="sec-mensual" data-pane="dir" style="order:30">
+      <h2>Órdenes creadas por mes</h2>
+      <p class="hint">Barras: creadas, por tipo. Línea: completadas. Clic en un mes para filtrar.</p>
       <div id="monthly"></div>
       <p class="note" id="monthNote"></p>
     </section>
 
-    <section class="card c12 stcard" id="sec-estado" data-pane="det" style="order:8">
+    <section class="card c4 stcard" data-pane="dir" style="order:40">
       <h2>Estado</h2>
       <p class="hint">Clic en un estado para filtrar.</p>
       <div class="stwrap" id="donut"></div>
@@ -979,7 +934,7 @@ function renderKPIs(){
   const dl=row=>(A&&B)?deltaCell(row,A[row.k],B[row.k])+' <span>'+mc+' frente a '+mp+'</span>':'';
   // completadas dentro de cada mes (por fecha en que se completaron): comparación pareja entre meses
   const cm=k=>sub0.filter(w=>w.completed&&w.completed.slice(0,7)===k).length;
-  const dDone=cp.prev?deltaCell(CMP_ROWS[0],cm(cp.cur.key),cm(cp.prev.key))+' <span>frente a '+mp+'</span>':'';
+  const dDone=cp.prev?deltaCell(CMP_ROWS[0],cm(cp.cur.key),cm(cp.prev.key))+' <span>completadas en '+mc+' frente a '+mp+'</span>':'';
   // pendientes hoy contra hace 30 días (solo sin filtro de fechas ni de estado)
   let dPend='';
   const d0=REF-30;
@@ -991,7 +946,7 @@ function renderKPIs(){
   const prevOk=(A&&A.prevent!=null)?A.prevent>=GOALS.prev:null;
   const items=[
     {k:'Órdenes',n:fmtN(sub.length),s:'de '+fmtN(DATA.length)+' en total',d:dl(CMP_ROWS[0])},
-    {k:'Completadas en '+mc,n:fmtN(cm(cp.cur.key)),s:sub.length?pct+'% del total: '+fmtN(done.length)+' de '+fmtN(sub.length):'Sin órdenes',d:dDone},
+    {k:'Completadas',n:sub.length?pct+'%':'—',s:fmtN(done.length)+' de '+fmtN(sub.length)+' órdenes',d:dDone},
     {k:'Pendientes',n:fmtN(pend.length),s:fmtN(hold)+' en espera',d:dPend,g:'pendientes'},
     {k:'Rezagadas (+'+GOALS.days+' días)',n:fmtN(over.length),g:'antiguedad',c:over.length?'is-bad':'is-good',
       s:o?'La más antigua: '+fmtN(Math.round(ageDays(o)))+' días (<button type="button" class="linkbtn" data-open="'+o.id+'">#'+o.id+'</button>)':'Sin pendientes',
@@ -1027,8 +982,6 @@ function renderMonthly(){
     const done=sub.filter(w=>w.completed&&w.completed.slice(0,7)===mo.key).length;
     return {mo,c,tot:c.REACTIVE+c.PREVENTIVE+c.OTHER,done};
   });
-  const best=rows.reduce((a,r)=>(!a||r.tot>a.tot)?r:a,null);
-  $('#monH').textContent=(best&&best.tot)?MESES_L[best.mo.m].charAt(0).toUpperCase()+MESES_L[best.mo.m].slice(1)+' fue el mes con más órdenes: '+best.tot:'Órdenes creadas por mes';
   const maxV=Math.max(5,...rows.map(r=>Math.max(r.tot,r.done)));
   const step=maxV>40?10:(maxV>20?5:2);
   const top=Math.ceil(maxV/step)*step;
@@ -1405,8 +1358,6 @@ function renderCompare(){
   const show=(row,st)=>st&&st[row.k]!=null?row.f(st[row.k]):'—';
   $('#cmpTbl').innerHTML='<thead><tr><th scope="col">Indicador</th><th class="num" scope="col">'+esc(mname(cur))+'</th><th class="num" scope="col">'+esc(mname(prev))+'</th><th class="num" scope="col">Cambio</th></tr></thead><tbody>'+
     CMP_ROWS.map(r=>'<tr><td>'+r.l+(r.g?infoBtn(r.g):'')+'</td><td class="num cur">'+show(r,A)+'</td><td class="num">'+show(r,B)+'</td><td class="num">'+(B?deltaCell(r,A&&A[r.k],B[r.k]):'<span class="flat">—</span>')+'</td></tr>').join('')+'<tr><td>Meta de referencia de preventivas</td><td class="num cur">'+GOALS.prev+'%</td><td class="num"></td><td class="num">'+(A&&A.prevent!=null?'<span class="'+(A.prevent>=GOALS.prev?'good':'bad')+'">'+(A.prevent>=GOALS.prev?'Cumple':'No cumple')+'</span>':'<span class="flat">—</span>')+'</td></tr></tbody>';
-  const dN=(A&&B)?A.n-B.n:0;
-  $('#cmpLead').innerHTML=(A&&A.n)?'En <b>'+esc(mnameDe(cur))+'</b> se crearon <b>'+fmtN(A.n)+' órdenes</b>'+(B?(dN===0?', las mismas que en '+MESES_L[prev.m]:', '+Math.abs(dN)+(dN>0?' más':' menos')+' que en '+MESES_L[prev.m]):'')+'; el '+A.react+'% fue reactivo y el '+A.prevent+'% preventivo.':'Sin órdenes creadas en '+esc(mnameDe(cur))+' con los filtros actuales.';
   const notes=[];
   if(dstr(REF).slice(0,7)===cur.key&&dstr(REF)<cur.last)notes.push('Mes parcial: hay datos hasta el '+fdate(dstr(REF))+', así que las cifras de '+mname(cur)+' aún pueden crecer.');
   if(!prev)notes.push('No hay un mes anterior en los datos para comparar.');
@@ -1757,7 +1708,6 @@ function renderActivity(){
   const items=ACT_ORDER.map(k=>({k:k,l:k,v:m.get(k)||0,c:ACT_TECH.indexOf(k)>=0?'var(--accent)':'var(--oth)'})).filter(i=>i.v>0||state.sel.act.has(i.k)).sort((a,b)=>b.v-a.v);
   const sub=subset(['act']),n=sub.length,tech=sub.filter(w=>ACT_TECH.indexOf(w.act)>=0).length;
   $('#actHead').innerHTML=n?'<b>'+Math.round(tech/n*100)+'%</b> de las órdenes ('+fmtN(tech)+' de '+fmtN(n)+') son reparación, diagnóstico, revisión o actualización de equipos; el resto es armado y empaque, capacitación, exhibiciones, apoyo a almacén u orden del área.':'';
-  $('#actH').textContent=n?Math.round(tech/n*100)+'% de las órdenes son trabajo técnico':'¿En qué se va el trabajo del área?';
   $('#acts').innerHTML=rowsHTML('act',items,fmtN);
 }
 
@@ -1801,7 +1751,7 @@ $('#qCsv').addEventListener('click',()=>{
 /* ---------- pendientes a lo largo del tiempo ---------- */
 function renderBacklog(){
   const box=$('#backlog'),sub=subset(['date','status']);
-  if(!sub.length){box.innerHTML='<div class="empty">Sin órdenes con los filtros actuales.</div>';$('#backNote').textContent='';$('#backH').textContent='Pendientes a lo largo del tiempo';return;}
+  if(!sub.length){box.innerHTML='<div class="empty">Sin órdenes con los filtros actuales.</div>';$('#backNote').textContent='';return;}
   const W=Math.max(box.clientWidth,320),H=412,pl=30,pr=14,pt=36,pb=28;
   const d0=Math.min.apply(null,sub.map(w=>w.cd));
   const first=d0+((7-new Date(d0*864e5).getUTCDay())%7);
@@ -1839,7 +1789,6 @@ function renderBacklog(){
   s+='</svg>';
   box.innerHTML=s;
   const peak=Math.max.apply(null,ys),pi=ys.indexOf(peak);
-  $('#backH').textContent=ys[ys.length-1]<peak?'Los pendientes bajaron de '+peak+' a '+ys[ys.length-1]:'Pendientes en su punto más alto: '+peak;
   $('#backNote').textContent='Máximo de '+peak+' pendientes en la semana del '+fshort(dstr(pts[pi]))+'; al '+fdate(dstr(REF))+' hay '+ys[ys.length-1]+'.';
 }
 
@@ -2042,22 +1991,7 @@ const ANCH={
   det:[['sec-cinta','Línea de tiempo'],['sec-cambios','Cambios'],['sec-marca','Marca y causa'],['series','Series'],['sec-calidad','Calidad de captura'],['sec-tabla','Órdenes']]
 };
 const reduceMotion=()=>!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
-/* bloques plegables de la vista Dirección: plegados muestran solo el titular */
-const FOLDS=['sec-cmp','sec-overlock','sec-backlog','sec-act'];
-function setFold(id,folded,quiet){
-  const el=document.getElementById(id);if(!el||FOLDS.indexOf(id)<0)return;
-  const was=el.classList.contains('folded');
-  el.classList.toggle('folded',folded);
-  const b=el.querySelector('.foldbtn');
-  if(b){b.textContent=folded?'Ver detalle':'Ocultar detalle';b.setAttribute('aria-expanded',String(!folded));}
-  if(!quiet&&was&&!folded){renderAll();FX.play(el);}
-}
-FOLDS.forEach(id=>{
-  const el=document.getElementById(id);if(!el)return;
-  const b=document.createElement('button');b.type='button';b.className='foldbtn keep';b.dataset.fold=id;
-  el.appendChild(b);setFold(id,true,true);
-});
-function jumpTo(id){setFold(id,false);const el=document.getElementById(id);if(el&&el.scrollIntoView)el.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'start'});}
+function jumpTo(id){const el=document.getElementById(id);if(el&&el.scrollIntoView)el.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'start'});}
 function setPane(p,noRender){
   const changed=p!==PANE;
   PANE=p;document.body.setAttribute('data-pane',p);
@@ -2101,7 +2035,6 @@ function printSummary(){
   window.print();
 }
 document.addEventListener('click',e=>{
-  const fb=e.target.closest('.foldbtn');if(fb){const c=document.getElementById(fb.dataset.fold);setFold(fb.dataset.fold,!c.classList.contains('folded'));return;}
   const pb=e.target.closest('[data-pane-btn]');if(pb){setPane(pb.dataset.paneBtn);return;}
   const g=e.target.closest('[data-goto]');if(g){jumpTo(g.dataset.goto);return;}
   const v=e.target.closest('[data-view]');if(v){applyView(v.dataset.view);return;}
@@ -2117,8 +2050,8 @@ $('#glossBtn').addEventListener('click',()=>openGlossary(null));
 /* ---------- animaciones ---------- */
 const FX=(function(){
   const noop=()=>{};
-  if(reduceMotion()||!window.requestAnimationFrame)return {init:noop,after:noop,rearm:noop,swap:noop,rowsFrom:noop,play:noop};
-  const RV='header.top,#views,#sec-resumen,.tapebox,.filters,#kpis,main.grid>.card,main.grid>.gtitle,footer';
+  if(reduceMotion()||!window.requestAnimationFrame)return {init:noop,after:noop,rearm:noop,swap:noop,rowsFrom:noop};
+  const RV='header.top,#views,#topnav,#sec-resumen,.tapebox,.filters,#kpis,main.grid>.card,main.grid>.gtitle,footer';
   const SWAP=['#summary','#cmpTbl','#monthly','#reincOut','#donut .stbars','#backlog','#hist','#pending','#qList','#tbl'];
   const NUMS='.kpi .n,.chgstats b,.stbig b';
   const prevHTML=new Map(),prevW=new Map(),prevN=new Map(),tweens=new Set();
@@ -2218,7 +2151,6 @@ const FX=(function(){
   }
   return {
     init:init,
-    play:el=>{if(el.classList.contains('rv-in'))reveal(el,0);},
     after:()=>{scan();fills(null,false);nums(null,false);},
     rearm:p=>{
       if(!io)return;
@@ -2230,13 +2162,6 @@ const FX=(function(){
       $$('tbody tr',el).slice(n0).forEach((tr,i)=>{tr.style.animationDelay=Math.min(i,14)*30+'ms';tr.classList.add('fx-new');});
     }
   };
-})();
-
-/* ---------- barra de secciones: aparece al desplazarse más allá de los controles ---------- */
-(function(){
-  const nav=$('#topnav'),ctl=$('#views');
-  const upd=()=>{nav.classList.toggle('show',ctl.getBoundingClientRect().bottom<0);};
-  window.addEventListener('scroll',upd,{passive:true});window.addEventListener('resize',upd);upd();
 })();
 
 /* ---------- menú «Más» ---------- */
